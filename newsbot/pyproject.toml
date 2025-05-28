@@ -1,0 +1,20 @@
+[project]
+name = "newsbot"
+version = "0.1.0"
+authors = [{ name = "Your Name", email = "your@email.com" }]
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.8"
+
+dependencies = [
+    "langchain>=0.0.27",
+    "newspaper3k>=0.2.8",
+    "pgvector>=0.3.6",
+    "psycopg2-binary>=2.9.10",
+    "sentence-transformers>=3.2.1",
+    "torch>=2.5.1",
+    "transformers>=4.46.3",
+]
+
+[tool.uv]
+# Optional settings (if needed)
