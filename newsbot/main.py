@@ -133,52 +133,52 @@ class ChunkDB:
         self.cursor.close()
         self.conn.close()
 
-# # === Main Execution ===
-# if __name__ == "__main__":
-#     logging.info("Starting article processing pipeline...")
-#     embedder = Embedded()
-#     db = ChunkDB(dbname="vecdb", user="user", password="123")
-#     source = "http://cnn.com"
-#     urls = generateEntries(source, limit=1)
-
-#     for i, url in enumerate(urls):
-#         logging.info(f"[{i}] Processing article: {url}")
-#         doc = articleRetrieve(url)
-#         if not doc:
-#             logging.warning(f"Skipping empty article at {url}")
-#             continue
-#         chunks = chunker(doc)
-#         for j, chunk in enumerate(chunks):
-#             logging.debug(f"Processing chunk {j+1}/{len(chunks)}")
-#             embeddings = embedder.generate_embeddings(chunk)
-#             dbEntry = chunkentry(
-#                 uid=str(uuid.uuid4()),
-#                 sourceurl=url,
-#                 content=chunk,
-#                 embedding=embeddings
-#             )
-#             db.insert_chunk(dbEntry)
-#     db.close()
-#     logging.info("Pipeline complete.")
-
 # === Main Execution ===
 if __name__ == "__main__":
     logging.info("Starting article processing pipeline...")
     embedder = Embedded()
     db = ChunkDB(dbname="vecdb", user="user", password="123")
-    url = "http://fox13now.com/2013/12/30/new-year-new-laws-obamacare-pot-guns-and-drones/"
+    source = "http://cnn.com"
+    urls = generateEntries(source, limit=1)
 
-    doc = articleRetrieve(url)
-    chunks = chunker(doc)
-    for j, chunk in enumerate(chunks):
-        logging.debug(f"Processing chunk {j+1}/{len(chunks)}")
-        embeddings = embedder.generate_embeddings(chunk)
-        dbEntry = chunkentry(
-            uid=str(uuid.uuid4()),
-            sourceurl=url,
-            content=chunk,
-            embedding=embeddings
-        )
-        db.insert_chunk(dbEntry)
+    for i, url in enumerate(urls):
+        logging.info(f"[{i}] Processing article: {url}")
+        doc = articleRetrieve(url)
+        if not doc:
+            logging.warning(f"Skipping empty article at {url}")
+            continue
+        chunks = chunker(doc)
+        for j, chunk in enumerate(chunks):
+            logging.debug(f"Processing chunk {j+1}/{len(chunks)}")
+            embeddings = embedder.generate_embeddings(chunk)
+            dbEntry = chunkentry(
+                uid=str(uuid.uuid4()),
+                sourceurl=url,
+                content=chunk,
+                embedding=embeddings
+            )
+            db.insert_chunk(dbEntry)
     db.close()
     logging.info("Pipeline complete.")
+
+# # === Main Execution ===
+# if __name__ == "__main__":
+#     logging.info("Starting article processing pipeline...")
+#     embedder = Embedded()
+#     db = ChunkDB(dbname="vecdb", user="user", password="123")
+#     url = "http://fox13now.com/2013/12/30/new-year-new-laws-obamacare-pot-guns-and-drones/"
+
+#     doc = articleRetrieve(url)
+#     chunks = chunker(doc)
+#     for j, chunk in enumerate(chunks):
+#         logging.debug(f"Processing chunk {j+1}/{len(chunks)}")
+#         embeddings = embedder.generate_embeddings(chunk)
+#         dbEntry = chunkentry(
+#             uid=str(uuid.uuid4()),
+#             sourceurl=url,
+#             content=chunk,
+#             embedding=embeddings
+#         )
+#         db.insert_chunk(dbEntry)
+#     db.close()
+#     logging.info("Pipeline complete.")
