@@ -21,6 +21,17 @@ class Embedded:
         token_embeddings = self.embed(text)[0]
         return np.mean(token_embeddings, axis=0).tolist()
 
+# i added a text summarizing model (Falconai) sinc earlier it was giving seperate output but with this we can get like a good compiled answer based on our prompt
+class Summarizer:
+    def __init__(self):
+        logging.info("Loading summarization model...")
+        self.pipe = pipeline("summarization", model="Falconsai/text_summarization")
+
+    def summarize(self, text: str) -> str:
+        logging.info("Generating summary of top chunks...")
+        result = self.pipe(text, max_length=150, min_length=100, do_sample=False)
+        return result[0]['summary_text']
+
 # connected to pgvector-enabled PostgreSQL and register vector type
 class ChunkDB:
     def __init__(self, dbname, user, password, host="localhost", port=5432):
@@ -51,6 +62,7 @@ class ChunkDB:
 # Chatbot style output (just to view better we can improve this)
 if __name__ == "__main__":
     embedder = Embedded()
+    summarizer = Summarizer()
     db = ChunkDB(dbname="vecdb", user="user", password="123")
 
     print("Ask me something (Ctrl+C to quit):")
@@ -60,10 +72,24 @@ if __name__ == "__main__":
             embedding = embedder.generate_embeddings(user_query)
             results = db.search_similar_chunks(embedding)
 
-            print("\nBest Matching Content:")
-            for i, (content, url) in enumerate(results):
-                print(f"\n{i+1}. {content[:600]}...")  # trim long output
-                print(f"Source: {url}")
+            # Combine top chunks and summarize
+            # Combine top chunks and summarize
+            top_texts = []
+            source_urls = set()
+
+            for content, url in results:
+                top_texts.append(content)
+                source_urls.add(url)
+
+            combined_text = " ".join(top_texts)
+            summary = summarizer.summarize(combined_text)
+
+            print("\nChatbot Response:\n", summary)
+            print("\nSources:")
+            for url in source_urls:
+                print(f"- {url}")
+
+
     except KeyboardInterrupt:
         print("\nExiting...")
     finally:

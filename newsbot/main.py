@@ -25,8 +25,6 @@ def generateEntries(src: str, limit: int = 1) -> list[str]:
     for i, article in enumerate(paper.articles):
         if len(urls) >= limit:
             break
-        if any(skip in article.url for skip in ['video', 'weather', 'media']):
-            continue
         try:
             article.download()
             article.parse()
@@ -141,7 +139,7 @@ if __name__ == "__main__":
     embedder = Embedded()
     db = ChunkDB(dbname="vecdb", user="user", password="123")
     source = "http://cnn.com"
-    urls = generateEntries(source, limit=5)
+    urls = generateEntries(source, limit=15)
 
     for i, url in enumerate(urls):
         logging.info(f"[{i}] Processing article: {url}")
@@ -152,6 +150,8 @@ if __name__ == "__main__":
         chunks = chunker(doc)
         for j, chunk in enumerate(chunks):
             logging.debug(f"Processing chunk {j+1}/{len(chunks)}")
+            if "ad" in chunk.lower() or len(chunk.strip()) < 100:
+                continue
             embeddings = embedder.generate_embeddings(chunk)
             dbEntry = chunkentry(
                 uid=str(uuid.uuid4()),
