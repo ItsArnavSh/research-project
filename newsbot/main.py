@@ -8,7 +8,6 @@ import numpy as np
 import psycopg2
 from pgvector.psycopg2 import register_vector
 from dataclasses import dataclass
-
 import logging
 
 # Setup logging
