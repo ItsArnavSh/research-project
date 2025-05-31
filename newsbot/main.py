@@ -162,27 +162,27 @@ if __name__ == "__main__":
 #     # logging.info("Starting article processing pipeline...")
     embedder = Embedded()
     db = ChunkDB(dbname="vecdb", user="user", password="123")
-#     source = "news_urls.csv"
-#     urls = generateEntries(source)
+    source = "news_urls.csv"
+    urls = generateEntries(source)
 
-#     for i, url in enumerate(urls):
-#         logging.info(f"[{i}] Processing article: {url}")
-#         doc = articleRetrieve(url)
-#         if not doc:
-#             logging.warning(f"Skipping empty article at {url}")
-#             continue
-#         chunks = chunker(doc)
-#         for j, chunk in enumerate(chunks):
-#             logging.debug(f"Processing chunk {j+1}/{len(chunks)}")
-#             embeddings = embedder.generate_embeddings(chunk)
-#             dbEntry = chunkentry(
-#                 uid=str(uuid.uuid4()),
-#                 sourceurl=url,
-#                 content=chunk,
-#                 embedding=embeddings
-#             )
-#             db.insert_chunk(dbEntry)
-#     logging.info("Pipeline complete.")
+    for i, url in enumerate(urls):
+        logging.info(f"[{i}] Processing article: {url}")
+        doc = articleRetrieve(url)
+        if not doc:
+            logging.warning(f"Skipping empty article at {url}")
+            continue
+        chunks = chunker(doc)
+        for j, chunk in enumerate(chunks):
+            logging.debug(f"Processing chunk {j+1}/{len(chunks)}")
+            embeddings = embedder.generate_embeddings(chunk)
+            dbEntry = chunkentry(
+                uid=str(uuid.uuid4()),
+                sourceurl=url,
+                content=chunk,
+                embedding=embeddings
+            )
+            db.insert_chunk(dbEntry)
+    logging.info("Pipeline complete.")
     query_text = "Tariff with China"
     embedding = embedder.generate_embeddings(query_text)
     results = db.hybrid_search(query_text, embedding)
