@@ -7,7 +7,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-# Jina embedding model 
+# Jina embedding model
 class Embedded:
     def __init__(self):
         logging.info("Loading Jina embeddings model...")
@@ -31,7 +31,7 @@ class Summarizer:
         result = self.pipe(text, max_length=150, min_length=100, do_sample=False)
         return result[0]["summary_text"]
 
-# PostgreSQL pgvector search --> same as in main.py 
+# PostgreSQL pgvector search --> same as in main.py
 class ChunkDB:
     def __init__(self, dbname, user, password, host="localhost", port=5432):
         self.conn = psycopg2.connect(
@@ -45,7 +45,7 @@ class ChunkDB:
             """
             SELECT content, sourceurl
             FROM chunks
-            ORDER BY embedding <-> %s::vector
+            ORDER BY embedding <=> %s::vector
             LIMIT %s;
             """, (query_embedding, top_k)
         )
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     embedder = Embedded()                   # to convert question asked to vector
     summarizer = Summarizer()               # to give a summarized response
     db = ChunkDB(dbname="vecdb", user="user", password="123")           # get the database of embeddings made in main.py
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)      # to remember old conversation and maintain that in the next response 
+    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)      # to remember old conversation and maintain that in the next response
 
     print("Ask me something (Ctrl+C to quit):")
     try:
@@ -77,7 +77,7 @@ if __name__ == "__main__":
             top_texts = []                                              # to make a list of the different article results
             source_urls = set()                                         #  to make a set of the urls used to make the summary
             for content, url in results:
-                top_texts.append(content)                           
+                top_texts.append(content)
                 source_urls.add(url)
 
             combined_text = " ".join(top_texts)                 # joining the closest srticle result into a combined text
